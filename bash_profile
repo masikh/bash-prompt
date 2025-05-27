@@ -24,40 +24,58 @@ BMAG="\[\033[45m\]" # background magenta
 BCYN="\[\033[46m\]" # background cyan
 BWHT="\[\033[47m\]" # background white
 
+SPACE="\ "
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
 spwd () {
-	set $PWD
-	pwd_length=14
-	pwd_symbol="..."
-	newPWD="${PWD}"
-	if [ $(echo -n $newPWD | wc -c | tr -d " ") -gt $pwd_length ]
-	then
-		newPWDB=$(echo -n $newPWD | awk -F '/' '{print $1 "/" $2 "/."}')
-	       	NF=$(echo -n $newPWD | awk -F '/' '{print NF-3 "./"}')
-	       	newPWDE=$(echo -n $newPWD | awk -F '/' '{print $(NF)}')
-		newPWD=$newPWDB$NF$newPWDE
-	fi
-	echo $newPWD
+    local pwd_length=20
+    local full_pwd="${PWD}"
+    local pwd_chars=${#full_pwd}
+    local FGRN=$'\033[32m'
+    local FMAG=$'\033[35m'
+    local RS=$'\033[0m'
+
+    if [ "$pwd_chars" -le "$pwd_length" ]; then
+        echo "$full_pwd"
+    else
+        echo "${FGRN}...${FMAG}${full_pwd: -17}"
+    fi
 }
+
+# --- PROMPT_COMMAND logic ---
+PROMPT_COMMAND='
+    last_histnum=$histnum
+    histnum=$(history 1 | awk "{print \$1}")
+    if [[ "$histnum" == "$last_histnum" ]]; then
+        just_enter=true
+    else
+        just_enter=false
+    fi
+'
 
 PS1="\$(
     RET=\$?;
-    echo -n $FRET$RS$FCYN\┌\($RS$FMAG\u@\H$RS$FCYN\);
-    echo -n -$RS$FCYN\($RS\[\033[35m\]jobs:\j$RS$FCYN\);
-    echo -n -$RS$FCYN\($RS$FMAG\$(spwd)$RS$FCYN\)
-    echo -n -\($RS$FMAG\$(ls -1 | wc -l | sed 's: ::g') files,
-    echo -n \$(ls -lah | grep -m 1 total | sed 's/total //');
-    echo 'b$RS$FCYN)'
-    echo -n '$RS$FCYN';
-    echo -n $'└';
-    echo -n '>$RS$FRED \!';
-    if [ \$RET = "0" ]; then 
-        echo $RS$FCYN ● $RS; 
-    else 
-        echo -n $RS$FRED ● $RS
+    
+    if [[ \"\$just_enter\" == true ]]; then 
+        echo -n ${RS}${FCYN} ● ${RS}; 
+    else
+        if [ -n \"\$VIRTUAL_ENV\" ]; then
+            echo -n ${FCYN}[${RS}${FRED}\$(basename \"\$VIRTUAL_ENV\")${RS}${FCYN}]${SPACE};
+            echo -n [${RS}${FMAG}\u@\H:\$(spwd)${RS}${FCYN}];
+        else
+            echo -n ${FCYN}[${RS}${FMAG}\u@\H:\$(spwd)${RS}${FCYN}];
+        fi
+        echo -n ${SPACE}${RS}${FCYN}[${RS}\[\033[35m\]jobs:${FRED}\j${RS}${FCYN}];
+        echo '${RS}${FCYN}';
+        if [ \$RET = "0" ]; then
+            echo ${RS}${FCYN} ● ${RS};
+        else
+            echo -n ${RS}${FRED} ● ${RS};
+        fi;
     fi;
 )"
 
 PS2="\$(
-	RET=\$?;
-	[ \$RET = '0' ] && echo '$RS$FCYN└> ● $RS' || echo '$RS$FCYN└>$RS$FRED ● $RS';
+    echo '$RS$FGRN ● $RS';
 )"
