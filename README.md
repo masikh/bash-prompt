@@ -1,4 +1,7 @@
-# bash-prompt
+# Prompt
+
+.zshrc is for the zsh shell
+.bash_profile is for the bash shell
 
 An shell environment file that shows:
 
