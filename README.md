@@ -1,5 +1,7 @@
 # Prompt
 
+[![Language](https://img.shields.io/github/languages/top/masikh/bash-prompt)](https://github.com/masikh/bash-prompt) [![Last commit](https://img.shields.io/github/last-commit/masikh/bash-prompt)](https://github.com/masikh/bash-prompt/commits) [![Repo size](https://img.shields.io/github/repo-size/masikh/bash-prompt)](https://github.com/masikh/bash-prompt) [![Stars](https://img.shields.io/github/stars/masikh/bash-prompt?style=flat)](https://github.com/masikh/bash-prompt/stargazers)
+
 .zshrc is for the zsh shell
 .bash_profile is for the bash shell
 
